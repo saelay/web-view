@@ -389,7 +389,6 @@ LRESULT CALLBACK WebviewWndProc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp)
         break;
     }
     case WM_APP: {
-        fprintf(stderr, "msg4 %d %d\n", hwnd, lp);
         auto f = (dispatch_fn_t*)(lp);
         (*f)();
         delete f;
