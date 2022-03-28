@@ -197,11 +197,6 @@ public:
             TranslateMessage(&msg);
             DispatchMessage(&msg);
             return 0;
-        }
-        if (msg.message == WM_APP) {
-            auto f = (dispatch_fn_t*)(msg.lParam);
-            (*f)();
-            delete f;
         } else if (msg.message == WM_QUIT) {
             return -1;
         }
@@ -211,8 +206,7 @@ public:
     void exit() { PostQuitMessage(0); }
     void dispatch(dispatch_fn_t f)
     {
-
-        PostThreadMessage(m_main_thread, WM_APP, 0, (LPARAM) new dispatch_fn_t(f));
+        PostMessage(m_window, WM_APP, 0, (LPARAM) new dispatch_fn_t(f));
     }
 
     void set_title(const char* title)
@@ -394,7 +388,13 @@ LRESULT CALLBACK WebviewWndProc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp)
 
         break;
     }
-
+    case WM_APP: {
+        fprintf(stderr, "msg4 %d %d\n", hwnd, lp);
+        auto f = (dispatch_fn_t*)(lp);
+        (*f)();
+        delete f;
+        break;
+    }
     default:
         return DefWindowProc(hwnd, msg, wp, lp);
     }
